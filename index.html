@@ -7,7 +7,7 @@
 <body>
   <nav class="uk-navbar">
     <div class="uk-navbar-content">Canvas Logger</div>
-    <div class="uk-navbar-content"><button id="record-button" class="uk-button-danger uk-button-large">Record</button></div>
+    <div class="uk-navbar-content"><button id="record-button" class="uk-button-danger uk-button-large">Save</button></div>
   </nav>
   <div id="canvas" style=""></div>
 
@@ -25,11 +25,21 @@
     }
     context = canvas.getContext("2d");
 
-    var clickX = new Array();
-    var clickY = new Array();
-    var clickDrag = new Array();
-    var clickTimes = new Array();
+    var clickX;
+    var clickY;
+    var clickDrag;
+    var clickTimes;
     var paint;
+    function clear() {
+      clickX = new Array();
+      clickY = new Array();
+      clickDrag = new Array();
+      clickTimes = new Array();
+      
+      redraw();
+    }
+
+    clear();
 
     function addClick(x, y, dragging) {
       clickX.push(x);
@@ -105,6 +115,8 @@
         }
 
         $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + endType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
+
+        clear();
       });
     });
   });
