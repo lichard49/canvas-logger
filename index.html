@@ -7,12 +7,13 @@
 <body>
   <nav class="uk-navbar">
     <div class="uk-navbar-content">Canvas Logger</div>
-    <div class="uk-navbar-content"><button class="uk-button-danger uk-button-large">Record</button></div>
+    <div class="uk-navbar-content"><button id="record-button" class="uk-button-danger uk-button-large">Record</button></div>
   </nav>
   <div id="canvas" style=""></div>
 
   <script type="text/javascript">
   $(document).ready(function() {
+    // === canvas stuff
     var canvasDiv = document.getElementById('canvas');
     canvas = document.createElement('canvas');
     canvas.setAttribute('width', window.innerWidth-10);
@@ -27,17 +28,17 @@
     var clickX = new Array();
     var clickY = new Array();
     var clickDrag = new Array();
+    var clickTimes = new Array();
     var paint;
 
-    function addClick(x, y, dragging)
-    {
+    function addClick(x, y, dragging) {
       clickX.push(x);
       clickY.push(y);
       clickDrag.push(dragging);
-      console.log(clickX);
+      clickTimes.push(new Date().getTime());
     }
 
-    function redraw(){
+    function redraw() {
       context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
       
       context.strokeStyle = "#df4b26";
@@ -46,9 +47,10 @@
           
       for(var i=0; i < clickX.length; i++) {
         context.beginPath();
-        if(clickDrag[i] && i){
+        if(clickDrag[i] && i) {
           context.moveTo(clickX[i-1], clickY[i-1]);
-         } else {
+         }
+         else {
            context.moveTo(clickX[i]-1, clickY[i]);
          }
          context.lineTo(clickX[i], clickY[i]);
@@ -57,35 +59,53 @@
       }
     }
 
-    $('#canvas').mousedown(function(e){
+    $('#canvas').mousedown(function(e) {
       var mouseX = e.pageX - this.offsetLeft;
       var mouseY = e.pageY - this.offsetTop;
-      
-      console.log('down');
 
       paint = true;
       addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
       redraw();
     });
 
-    $('#canvas').mousemove(function(e){
-
-      console.log('move');
-
+    $('#canvas').mousemove(function(e) {
       if(paint){
         addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
         redraw();
       }
     });
 
-    $('#canvas').mouseup(function(e){
-      console.log('up');
+    $('#canvas').mouseup(function(e) {
       paint = false;
     });
 
-    $('#canvas').mouseleave(function(e){
-      console.log('leave');
+    $('#canvas').mouseleave(function(e) {
       paint = false;
+    });
+
+    // === button stuff
+    var publicKey = 'n1mannrNXET6NM00Zzqj';
+    var privateKey = 'MoV2mmgJnrcjoqAA9eY2'; // we're not doing anything top secret here anyways
+    $('#record-button').click(function() {
+      // prompt for session ID
+      UIkit.modal.prompt("Session ID:", '', function(name){
+        var logType = 'LOG'; // data types can be LOG or NEW
+        var newType = 'NEW';
+        var endType = 'END';
+        var empty = '';
+
+        // send a segmenting packet
+        $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + newType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
+
+        // send data
+        for(var i = 0; i < clickX.length; i++) {
+          console.log('sending ' + i);
+          $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + logType + '&id=' + empty + '&time=' + clickTimes[i] + '&x= ' + clickX[i] + '&y=' + clickY[i]);
+          console.log('done with ' + i);
+        }
+
+        $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + endType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
+      });
     });
   });
   </script>
