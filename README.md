@@ -1,5 +1,5 @@
 # Canvas Logger
-A utility to help collect ground truth data for the Digiwrite project.  Simply collects the coordinates of mouse or stylus movement and stores them on a Sparkfun phantom server.
+A utility to help collect ground truth data for the Digiwrite project.  Simply collects the coordinates of mouse or stylus movement and stores them on a Sparkfun phantom server.  Used [UIKit](http://getuikit.com/) as a front-end framework.
 
 ## Live
 Canvas Logger is live and hosted on GitHub pages at:
