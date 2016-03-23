@@ -1,0 +1,93 @@
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="uikit/css/uikit.min.css" />
+  <script src="uikit/js/uikit.min.js"></script>
+</head>
+<body>
+  <nav class="uk-navbar">
+    <div class="uk-navbar-content">Canvas Logger</div>
+    <div class="uk-navbar-content"><button class="uk-button-danger uk-button-large">Record</button></div>
+  </nav>
+  <div id="canvas" style=""></div>
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+    var canvasDiv = document.getElementById('canvas');
+    canvas = document.createElement('canvas');
+    canvas.setAttribute('width', window.innerWidth-10);
+    canvas.setAttribute('height', window.innerHeight-20);
+    canvas.setAttribute('id', 'canvas');
+    canvasDiv.appendChild(canvas);
+    if(typeof G_vmlCanvasManager != 'undefined') {
+      canvas = G_vmlCanvasManager.initElement(canvas);
+    }
+    context = canvas.getContext("2d");
+
+    var clickX = new Array();
+    var clickY = new Array();
+    var clickDrag = new Array();
+    var paint;
+
+    function addClick(x, y, dragging)
+    {
+      clickX.push(x);
+      clickY.push(y);
+      clickDrag.push(dragging);
+      console.log(clickX);
+    }
+
+    function redraw(){
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+      
+      context.strokeStyle = "#df4b26";
+      context.lineJoin = "round";
+      context.lineWidth = 5;
+          
+      for(var i=0; i < clickX.length; i++) {
+        context.beginPath();
+        if(clickDrag[i] && i){
+          context.moveTo(clickX[i-1], clickY[i-1]);
+         } else {
+           context.moveTo(clickX[i]-1, clickY[i]);
+         }
+         context.lineTo(clickX[i], clickY[i]);
+         context.closePath();
+         context.stroke();
+      }
+    }
+
+    $('#canvas').mousedown(function(e){
+      var mouseX = e.pageX - this.offsetLeft;
+      var mouseY = e.pageY - this.offsetTop;
+      
+      console.log('down');
+
+      paint = true;
+      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+      redraw();
+    });
+
+    $('#canvas').mousemove(function(e){
+
+      console.log('move');
+
+      if(paint){
+        addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+        redraw();
+      }
+    });
+
+    $('#canvas').mouseup(function(e){
+      console.log('up');
+      paint = false;
+    });
+
+    $('#canvas').mouseleave(function(e){
+      console.log('leave');
+      paint = false;
+    });
+  });
+  </script>
+</body>
+</html>
