@@ -49,11 +49,12 @@
 
     clear();
 
+    var startTime;
     function addClick(x, y, dragging) {
       clickX.push(x);
       clickY.push(y);
       clickDrag.push(dragging);
-      clickTimes.push(new Date().getTime());
+      clickTimes.push(new Date().getTime()-startTime);
     }
 
     function redraw() {
@@ -127,6 +128,8 @@
         $('#record-button').removeClass('uk-button-success');
         $('#record-button').addClass('uk-button-danger');
         clear();
+
+        startTime = new Date().getTime();
       }
       else {
         firebaseState.set('off');
