@@ -18,7 +18,7 @@
   <nav class="uk-navbar">
     <ul class="uk-navbar-nav">
       <li><h1 style="margin-left: 5px; margin-right: 20px; margin-top: 5px; margin-bottom: 5px;">Canvas Logger</h1></li>
-      <li><button id="record-button" class="uk-button-danger uk-button-large" style="margin-top: 5px; margin-bottom: 5px;">Save</button></li>
+      <li><button id="record-button" class="uk-button-success uk-button-large" style="margin-top: 5px; margin-bottom: 5px;">Start</button></li>
     </ul>
   </nav>
   <div id="canvas" style="overflow: hidden;"></div>
@@ -125,27 +125,39 @@
     var publicKey = 'n1mannrNXET6NM00Zzqj';
     var privateKey = 'MoV2mmgJnrcjoqAA9eY2'; // we're not doing anything top secret here anyways
     $('#record-button').click(function() {
-      // prompt for session ID
-      UIkit.modal.prompt("Session ID:", '', function(name){
-        var logType = 'LOG'; // data types can be LOG or NEW
-        var newType = 'NEW';
-        var endType = 'END';
-        var empty = '';
-
-        // send a segmenting packet
-        $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + newType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
-
-        // send data
-        for(var i = 0; i < clickX.length; i++) {
-          console.log('sending ' + i);
-          $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + logType + '&id=' + empty + '&time=' + clickTimes[i] + '&x= ' + clickX[i] + '&y=' + clickY[i]);
-          console.log('done with ' + i);
-        }
-
-        $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + endType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
-
+      if($('#record-button').text() == 'Start') {
+        $('#record-button').text('Stop');
+        $('#record-button').removeClass('uk-button-success');
+        $('#record-button').addClass('uk-button-danger');
         clear();
-      });
+      }
+      else {
+        // prompt for session ID
+        UIkit.modal.prompt("Session ID:", '', function(name){
+          $('#record-button').text('Start');
+          $('#record-button').removeClass('uk-button-danger');
+          $('#record-button').addClass('uk-button-success');
+
+          var logType = 'LOG'; // data types can be LOG or NEW
+          var newType = 'NEW';
+          var endType = 'END';
+          var empty = '';
+
+          // send a segmenting packet
+          $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + newType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
+
+          // send data
+          for(var i = 0; i < clickX.length; i++) {
+            console.log('sending ' + i);
+            $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + logType + '&id=' + empty + '&time=' + clickTimes[i] + '&x= ' + clickX[i] + '&y=' + clickY[i]);
+            console.log('done with ' + i);
+          }
+
+          $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + endType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
+
+          clear();
+        });
+      }
     });
   });
   </script>
