@@ -15,10 +15,11 @@ def doStuff():
         time.sleep(1)
 
 def callback(e):
-    print e
     if e[1]['data'] == 'on':
+        print 'received start trigger'
         thread.start_new_thread(doStuff, ())
     elif e[1]['data'] == 'off':
+        print 'received stop trigger'
         running = False
 
         try:
