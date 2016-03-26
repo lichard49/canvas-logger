@@ -129,14 +129,14 @@
         clear();
       }
       else {
+        firebaseState.set('off');
+
+        $('#record-button').text('Start');
+        $('#record-button').removeClass('uk-button-danger');
+        $('#record-button').addClass('uk-button-success');
+
         // prompt for session ID
         UIkit.modal.prompt("Session ID:", '', function(name){
-          firebaseState.set('off');
-
-          $('#record-button').text('Start');
-          $('#record-button').removeClass('uk-button-danger');
-          $('#record-button').addClass('uk-button-success');
-
           var data = {};
           for(var i = 0; i < clickX.length; i++) {
             var line = {};
