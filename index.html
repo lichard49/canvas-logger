@@ -1,10 +1,10 @@
-<html>
+<html style="height: 100%; overflow: hidden;">
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
   <link rel="stylesheet" href="uikit/css/uikit.min.css" />
   <script src="uikit/js/uikit.min.js"></script>
 </head>
-<body>
+<body style="height: 100%; overflow: hidden;">
   <nav class="uk-navbar">
     <div class="uk-navbar-content">Canvas Logger</div>
     <div class="uk-navbar-content"><button id="record-button" class="uk-button-danger uk-button-large">Save</button></div>
@@ -70,27 +70,42 @@
       }
     }
 
-    $('#canvas').mousedown(function(e) {
-      var mouseX = e.pageX - this.offsetLeft;
-      var mouseY = e.pageY - this.offsetTop;
+    $('#canvas').on('mousedown touchstart', function(e) {
+      var eventX;
+      var eventY;
+      if(e.type == 'touchstart') {
+        eventX = e.originalEvent.touches[0].pageX;
+        eventY = e.originalEvent.touches[0].pageY;
+      }
+      else {
+        eventX = e.pageX;
+        eventY = e.pageY;
+      }
 
       paint = true;
-      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+      addClick(eventX - this.offsetLeft, eventY - this.offsetTop, false);
       redraw();
     });
 
-    $('#canvas').mousemove(function(e) {
+    $('#canvas').on('mousemove touchmove', function(e) {
+      var eventX;
+      var eventY;
+      if(e.type == 'touchmove') {
+        eventX = e.originalEvent.touches[0].pageX;
+        eventY = e.originalEvent.touches[0].pageY;
+      }
+      else {
+        eventX = e.pageX;
+        eventY = e.pageY;
+      }
+
       if(paint){
-        addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+        addClick(eventX - this.offsetLeft, eventY - this.offsetTop, true);
         redraw();
       }
     });
 
-    $('#canvas').mouseup(function(e) {
-      paint = false;
-    });
-
-    $('#canvas').mouseleave(function(e) {
+    $('#canvas').on('mouseup mouseleave touchend touchcancel', function(e) {
       paint = false;
     });
 
