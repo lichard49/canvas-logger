@@ -3,10 +3,11 @@ import json
 import time
 import thread
 
-url = 'digiwrite.firebaseIO.com'
-running = True
+url = 'digiwrite.firebaseIO.com/state'
+running = False
 
 def doStuff():
+    global running
     print 'start doing stuff'
     x = 1
     while running:
@@ -15,10 +16,12 @@ def doStuff():
         time.sleep(1)
 
 def callback(e):
+    global running
     if e[1]['data'] == 'on':
         print 'received start trigger'
+        running = True
         thread.start_new_thread(doStuff, ())
-    elif e[1]['data'] == 'off':
+    elif running and e[1]['data'] == 'off':
         print 'received stop trigger'
         running = False
 
