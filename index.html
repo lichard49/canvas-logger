@@ -10,12 +10,6 @@
   <title>Canvas Logger</title>
 </head>
 <body style="height: 100%; overflow: hidden;">
-  <!-- <nav class="uk-navbar">
-    <ul class="uk-navbar-content">
-      <h1>Canvas Logger</h1>
-      <button id="record-button" class="uk-button-danger uk-button-large">Save</button>
-    </div>
-  </nav> -->
   <nav class="uk-navbar">
     <ul class="uk-navbar-nav">
       <li><h1 style="margin-left: 5px; margin-right: 20px; margin-top: 5px; margin-bottom: 5px;">Canvas Logger</h1></li>
@@ -123,12 +117,11 @@
     });
 
     // === button stuff
-    var firebase = new Firebase("https://digiwrite.firebaseio.com/");
-    var publicKey = 'n1mannrNXET6NM00Zzqj';
-    var privateKey = 'MoV2mmgJnrcjoqAA9eY2'; // we're not doing anything top secret here anyways
+    var firebaseState = new Firebase("https://digiwrite.firebaseio.com/state");
+    var firebaseData = new Firebase("https://digiwrite.firebaseio.com/data");
     $('#record-button').click(function() {
       if($('#record-button').text() == 'Start') {
-        firebase.set({state: 'on'});
+        firebaseState.set('on');
 
         $('#record-button').text('Stop');
         $('#record-button').removeClass('uk-button-success');
@@ -138,28 +131,22 @@
       else {
         // prompt for session ID
         UIkit.modal.prompt("Session ID:", '', function(name){
-          firebase.set({state: 'off'});
+          firebaseState.set('off');
 
           $('#record-button').text('Start');
           $('#record-button').removeClass('uk-button-danger');
           $('#record-button').addClass('uk-button-success');
 
-          var logType = 'LOG'; // data types can be LOG or NEW
-          var newType = 'NEW';
-          var endType = 'END';
-          var empty = '';
-
-          // send a segmenting packet
-          $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + newType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
-
-          // send data
+          var data = {};
           for(var i = 0; i < clickX.length; i++) {
-            console.log('sending ' + i);
-            $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + logType + '&id=' + empty + '&time=' + clickTimes[i] + '&x= ' + clickX[i] + '&y=' + clickY[i]);
-            console.log('done with ' + i);
+            var line = {};
+            line['x'] = clickX[i];
+            line['y'] = clickY[i];
+            data[clickTimes[i]] = line;
           }
-
-          $.get('http://data.sparkfun.com/input/' + publicKey + '?private_key=' + privateKey + '&datatype=' + endType + '&id=' + name + '&time=' + empty + '&x= ' + empty + '&y=' + empty);
+          var wrappedData = {};
+          wrappedData[clickTimes[0] + '-' + name] = data;
+          firebaseData.set(wrappedData);
 
           clear();
         });
