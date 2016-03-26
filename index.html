@@ -147,7 +147,7 @@
             line['y'] = clickY[i];
             data[clickTimes[i]] = line;
           }
-          var label = clickTimes[0] + '-' + name;
+          var label = new Date().getTime() + '-' + name;
           firebaseData.child(label).set(data);
           var url = firebaseData + '/' + label + '.json';
           UIkit.modal.alert('Written to: <a href="' + url + '">' + url + '</a>');
