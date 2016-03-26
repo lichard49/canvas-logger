@@ -144,9 +144,10 @@
             line['y'] = clickY[i];
             data[clickTimes[i]] = line;
           }
-          var wrappedData = {};
-          wrappedData[clickTimes[0] + '-' + name] = data;
-          firebaseData.set(wrappedData);
+          var label = clickTimes[0] + '-' + name;
+          firebaseData.child(label).set(data);
+          var url = firebaseData + '/' + label + '.json';
+          UIkit.modal.alert('Written to: <a href="' + url + '">' + url + '</a>');
 
           clear();
         });
