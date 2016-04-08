@@ -21,12 +21,14 @@ function doFirebaseCanvas () {
   var clickX;
   var clickY;
   var clickDrag;
+  var clickState;
   var clickTimes;
   var paint;
   function clear() {
     clickX = new Array();
     clickY = new Array();
     clickDrag = new Array();
+    clickState = new Array();
     clickTimes = new Array();
     
     redraw();
@@ -35,10 +37,11 @@ function doFirebaseCanvas () {
   clear();
 
   var startTime;
-  function addClick(x, y, dragging) {
+  function addClick(x, y, dragging, state) {
     clickX.push(x);
     clickY.push(y);
     clickDrag.push(dragging);
+    clickState.push(state);
     clickTimes.push(new Date().getTime()-startTime);
   }
 
@@ -76,7 +79,7 @@ function doFirebaseCanvas () {
     }
 
     paint = true;
-    addClick(eventX - this.offsetLeft, eventY - this.offsetTop, false);
+    addClick(eventX - this.offsetLeft, eventY - this.offsetTop, false, 'down');
     redraw();
   });
 
@@ -94,13 +97,14 @@ function doFirebaseCanvas () {
     }
 
     if(paint){
-      addClick(eventX - this.offsetLeft, eventY - this.offsetTop, true);
+      addClick(eventX - this.offsetLeft, eventY - this.offsetTop, true, 'draw');
       redraw();
       if (withinArea(eventX - this.offsetLeft, eventY - this.offsetTop)) clickArea = next();
     }
   });
 
   $('#canvas').on('mouseup mouseleave touchend touchcancel', function(e) {
+    if (clickState) clickState[clickState.length - 1] = 'up';
     paint = false;
   });
 
@@ -134,6 +138,7 @@ function doFirebaseCanvas () {
           var line = {};
           line['x'] = clickX[i];
           line['y'] = clickY[i];
+          line['state'] = clickState[i];
           data[clickTimes[i]] = line;
         }
         var label = new Date().getTime() + '-' + name;
