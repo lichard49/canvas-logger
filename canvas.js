@@ -1,9 +1,27 @@
 var clickArea;
+var soundStartTime;
 function withinArea(x, y) {
   if (!clickArea || !clickArea.x || !clickArea.y) return false;
   var d = Math.sqrt(Math.pow(x - clickArea.x, 2) + Math.pow(y - clickArea.y, 2));
   return d < 20;
 }
+function doAudio() {
+  try {
+    var audioContext = new webkitAudioContext(); // Create audio container
+    oscillator = audioContext.createOscillator(); // Create sound source
+    oscillator.connect(audioContext.destination); // Connect sound to output
+    oscillator.start(0); // Play instantly
+    soundStartTime = new Date().getTime();
+    setTimeout(function() {
+      oscillator.stop();
+    }, 100);
+  }
+  catch(e) {
+    alert('Web Audio API is not supported in this browser');
+  }
+
+}
+
 function doFirebaseCanvas () {
   // === canvas stuff
   // most of this came from http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/#demo-simple
@@ -42,7 +60,7 @@ function doFirebaseCanvas () {
     clickY.push(y);
     clickDrag.push(dragging);
     clickState.push(state);
-    clickTimes.push(new Date().getTime()-startTime);
+    clickTimes.push(new Date().getTime());
   }
 
   function redraw() {
@@ -115,6 +133,7 @@ function doFirebaseCanvas () {
     if($('#record-button').text() == 'Start') {
 
       clickArea = next();
+      doAudio();
       firebaseState.set('on');
 
       $('#record-button').text('Stop');
@@ -134,6 +153,7 @@ function doFirebaseCanvas () {
       // prompt for session ID
       UIkit.modal.prompt("Session ID:", '', function(name){
         var data = {};
+        data[soundStartTime] = 'start';
         for(var i = 0; i < clickX.length; i++) {
           var line = {};
           line['x'] = clickX[i];
