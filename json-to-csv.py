@@ -9,7 +9,7 @@ for i in range(1, numFiles):
         memory = []
 
         for line in data:
-            if data[line] == 'start':
+            if data[line] == 'start' or data[line] == 'stop':
                 continue
             else:
                 memoryLine = [int(line), int(data[line]['x']), int(data[line]['y'])]
