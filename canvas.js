@@ -5,13 +5,13 @@ function withinArea(x, y) {
   var d = Math.sqrt(Math.pow(x - clickArea.x, 2) + Math.pow(y - clickArea.y, 2));
   return d < 20;
 }
-function doAudio() {
+function doAudio(when) {
   try {
     var audioContext = new webkitAudioContext(); // Create audio container
     oscillator = audioContext.createOscillator(); // Create sound source
     oscillator.connect(audioContext.destination); // Connect sound to output
     oscillator.start(0); // Play instantly
-    soundStartTime = new Date().getTime();
+    if (when == 'start') soundStartTime = new Date().getTime();
     setTimeout(function() {
       oscillator.stop();
     }, 100);
@@ -133,7 +133,7 @@ function doFirebaseCanvas () {
     if($('#record-button').text() == 'Start') {
       page = -1; // reset template
       clickArea = next();
-      doAudio();
+      doAudio('start');
       firebaseState.set('on');
 
       $('#record-button').text('Stop');
@@ -145,7 +145,7 @@ function doFirebaseCanvas () {
     }
     else {
       firebaseState.set('off');
-      doAudio();
+      doAudio('stop');
       var stopTime = new Date().getTime();
 
       $('#record-button').text('Start');
