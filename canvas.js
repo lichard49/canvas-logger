@@ -1,25 +1,18 @@
-var clickArea;
 var soundStartTime;
-function withinArea(x, y) {
-  if (!clickArea || !clickArea.x || !clickArea.y) return false;
-  var d = Math.sqrt(Math.pow(x - clickArea.x, 2) + Math.pow(y - clickArea.y, 2));
-  return d < 20;
+var oscillator, audioContext;
+try {
+  audioContext = new AudioContext(); // Create audio container
+} catch(e) {
+  alert('Web Audio API is not supported in this browser');
 }
 function doAudio(when) {
-  try {
-    var audioContext = new webkitAudioContext(); // Create audio container
-    oscillator = audioContext.createOscillator(); // Create sound source
-    oscillator.connect(audioContext.destination); // Connect sound to output
-    oscillator.start(0); // Play instantly
-    if (when == 'start') soundStartTime = new Date().getTime();
-    setTimeout(function() {
-      oscillator.stop();
-    }, 100);
-  }
-  catch(e) {
-    alert('Web Audio API is not supported in this browser');
-  }
-
+  oscillator = audioContext.createOscillator(); // Create sound source
+  oscillator.connect(audioContext.destination); // Connect sound to output
+  oscillator.start(0); // Play instantly
+  if (when == 'start') soundStartTime = new Date().getTime();
+  setTimeout(function() {
+    oscillator.stop();
+  }, 100);
 }
 
 function doFirebaseCanvas () {
@@ -117,7 +110,6 @@ function doFirebaseCanvas () {
     if(paint){
       addClick(eventX - this.offsetLeft, eventY - this.offsetTop, true, 'draw');
       redraw();
-      if (withinArea(eventX - this.offsetLeft, eventY - this.offsetTop)) clickArea = next();
     }
   });
 
@@ -131,10 +123,9 @@ function doFirebaseCanvas () {
   var firebaseData = new Firebase("https://digiwrite.firebaseio.com/data");
   $('#record-button').click(function() {
     if($('#record-button').text() == 'Start') {
-      page = -1; // reset template
-      clickArea = next();
       doAudio('start');
       firebaseState.set('on');
+      startTemplate($('#animate').prop('checked'));
 
       $('#record-button').text('Stop');
       $('#record-button').removeClass('uk-button-success');
@@ -147,6 +138,7 @@ function doFirebaseCanvas () {
       firebaseState.set('off');
       doAudio('stop');
       var stopTime = new Date().getTime();
+      stopTemplate();
 
       $('#record-button').text('Start');
       $('#record-button').removeClass('uk-button-danger');
