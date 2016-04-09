@@ -9,8 +9,11 @@ for i in range(1, numFiles):
         memory = []
 
         for line in data:
-            memoryLine = [int(line), int(data[line]['x']), int(data[line]['y'])]
-            memory.append(memoryLine)
+            if data[line] == 'start':
+                continue
+            else:
+                memoryLine = [int(line), int(data[line]['x']), int(data[line]['y'])]
+                memory.append(memoryLine)
         
         memory = sorted(memory, key=lambda x : x[0])
         out = open(fileName+'.csv', 'w')

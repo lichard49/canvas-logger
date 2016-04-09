@@ -131,7 +131,7 @@ function doFirebaseCanvas () {
   var firebaseData = new Firebase("https://digiwrite.firebaseio.com/data");
   $('#record-button').click(function() {
     if($('#record-button').text() == 'Start') {
-
+      page = -1; // reset template
       clickArea = next();
       doAudio();
       firebaseState.set('on');
@@ -145,6 +145,8 @@ function doFirebaseCanvas () {
     }
     else {
       firebaseState.set('off');
+      doAudio();
+      var stopTime = new Date().getTime();
 
       $('#record-button').text('Start');
       $('#record-button').removeClass('uk-button-danger');
@@ -161,6 +163,7 @@ function doFirebaseCanvas () {
           line['state'] = clickState[i];
           data[clickTimes[i]] = line;
         }
+        data[stopTime] = 'stop';
         var label = new Date().getTime() + '-' + name;
         firebaseData.child(label).set(data);
         var url = firebaseData + '/' + label + '.json';
