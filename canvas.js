@@ -1,7 +1,7 @@
 var soundStartTime;
 var oscillator, audioContext;
 try {
-  audioContext = new AudioContext(); // Create audio container
+  audioContext = new webkitAudioContext(); // Create audio container
 } catch(e) {
   alert('Web Audio API is not supported in this browser');
 }
